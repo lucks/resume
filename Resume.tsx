@@ -7,7 +7,7 @@ export const Resume: React.FC = () => {
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>John Doe - Frontend Developer</title>
+        <title>Lucks - FullStack Developer</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -28,7 +28,7 @@ export const Resume: React.FC = () => {
 
       <body>
         <div id="layout">
-          <h1 id="name">John Doe</h1>
+          <h1 id="name">Lucks</h1>
           <p id="bio">
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
             eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
@@ -42,8 +42,8 @@ export const Resume: React.FC = () => {
               "City, Country",
               <Phone countryCode="+999" number="999999999" />,
               {
-                label: "john.doe@gmail.com",
-                href: "mailto:john.doe@gmail.com",
+                label: "lucks17@gmail.com",
+                href: "mailto:lucks17@gmail.com",
               },
               {
                 label: "GitHub",
@@ -62,10 +62,10 @@ export const Resume: React.FC = () => {
                 name: "Google",
                 link: "https://google.com",
               }}
-              location="USA"
-              position="Senior Frontend Engineer"
+              location="MEX"
+              position="Senior Fullstack Engineer"
               dates={{
-                from: "December 2021",
+                from: "December 2016",
                 to: "December 2022",
               }}
               bullets={[
@@ -97,7 +97,7 @@ export const Resume: React.FC = () => {
                 name: "Amazon",
                 link: "https://amazon.com",
               }}
-              location="USA"
+              location="MEX"
               position="Senior Frontend Engineer"
               dates={{
                 from: "December 2019",
