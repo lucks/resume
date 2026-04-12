@@ -1,0 +1,174 @@
+From 165ae0da17c53640384b5c35e538a9a2087f7104 Mon Sep 17 00:00:00 2001
+From: Brian <brian@openclaw.ai>
+Date: Sun, 12 Apr 2026 16:11:27 +0000
+Subject: [PATCH] fix: security vulnerabilities, update dependencies, add
+ .gitignore
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Security fixes:
+- Add URL scheme validation (XSS prevention) in Link component
+- Add rel='noopener noreferrer' to all external links
+- Fix crossOrigin attribute (was empty string)
+
+Dependency updates:
+- React 18.2.0 → 18.3.1
+- TypeScript 4.9.4 → 5.7.3
+- @types packages updated
+- Replace deprecated ts-node-dev with tsx
+- Prettier 2.8.2 → 3.5.3
+
+Other:
+- Add .gitignore (node_modules, index.html, dist)
+- Add engines field for Node >=18
+- Fix broken GitHub/LinkedIn links
+- Replace 'any' with proper type guard
+---
+ .gitignore   | 21 ++++++---------------
+ Resume.tsx   | 29 ++++++++++++++++++++++-------
+ package.json | 25 +++++++++++++++----------
+ 3 files changed, 43 insertions(+), 32 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 7c9d23a..835a327 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,15 +1,6 @@
+-.yarn/*
+-!.yarn/patches
+-!.yarn/plugins
+-!.yarn/releases
+-!.yarn/sdks
+-!.yarn/versions
+-
+-# Swap the comments on the following lines if you don't wish to use zero-installs
+-# Documentation here: https://yarnpkg.com/features/zero-installs
+-.yarn/cache
+-#.pnp.*
+-
+-node_modules
+-
+-index.html
+\ No newline at end of file
++node_modules/
++index.html
++dist/
++.tsbuildinfo
++*.log
++.DS_Store
+diff --git a/Resume.tsx b/Resume.tsx
+index 5d7e29c..8dfd12e 100644
+--- a/Resume.tsx
++++ b/Resume.tsx
+@@ -13,7 +13,7 @@ export const Resume: React.FC = () => {
+         <link
+           rel="preconnect"
+           href="https://fonts.gstatic.com"
+-          crossOrigin=""
++          crossOrigin="anonymous"
+         />
+         <link
+           href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap"
+@@ -47,11 +47,11 @@ export const Resume: React.FC = () => {
+               },
+               {
+                 label: "GitHub",
+-                href: "https://www.github.com/",
++                href: "https://github.com/lucks",
+               },
+               {
+                 label: "LinkedIn",
+-                href: "https://www.linkedin.com",
++                href: "https://www.linkedin.com/in/lucksdev",
+               },
+             ]}
+           />
+@@ -288,6 +288,17 @@ const EducationSubsection: React.FC<{
+   );
+ };
+ 
++const ALLOWED_URL_SCHEMES = ["http:", "https:", "mailto:", "tel:"];
++
++function isSafeUrl(url: string): boolean {
++  try {
++    const parsed = new URL(url);
++    return ALLOWED_URL_SCHEMES.some((scheme) => parsed.protocol === scheme);
++  } catch {
++    return false;
++  }
++}
++
+ interface ILink {
+   label: React.ReactNode;
+   href: string;
+@@ -295,8 +306,8 @@ interface ILink {
+   className?: string;
+   highlight?: boolean;
+ }
+-function isLink(x: any): x is ILink {
+-  return x.label !== undefined;
++function isLink(x: unknown): x is ILink {
++  return typeof x === "object" && x !== null && "label" in x;
+ }
+ const Link: React.FC<ILink> = ({
+   label,
+@@ -305,10 +316,14 @@ const Link: React.FC<ILink> = ({
+   highlight,
+   target = "_blank",
+ }) => {
+-  const a = (
+-    <a target={target} href={href} className={className}>
++  const safe = isSafeUrl(href);
++  const rel = target === "_blank" ? "noopener noreferrer" : undefined;
++  const a = safe ? (
++    <a target={target} href={href} className={className} rel={rel}>
+       {label}
+     </a>
++  ) : (
++    <span className={className}>{label}</span>
+   );
+   return highlight ? <strong>{a}</strong> : a;
+ };
+diff --git a/package.json b/package.json
+index a5eb920..4481550 100644
+--- a/package.json
++++ b/package.json
+@@ -1,19 +1,24 @@
+ {
+   "name": "resume",
++  "version": "1.0.0",
+   "packageManager": "yarn@3.3.1",
+-  "dependencies": {
+-    "react": "^18.2.0",
+-    "react-dom": "^18.2.0",
+-    "typescript": "^4.9.4"
++  "engines": {
++    "node": ">=18.0.0"
+   },
+   "scripts": {
+-    "dev": "tsnd --respawn server.tsx",
+-    "build": "tsnd server.tsx"
++    "dev": "tsx watch server.tsx",
++    "build": "tsx server.tsx"
++  },
++  "dependencies": {
++    "react": "^18.3.1",
++    "react-dom": "^18.3.1",
++    "typescript": "^5.7.3"
+   },
+   "devDependencies": {
+-    "@types/node": "^18.11.18",
+-    "@types/react-dom": "^18.0.10",
+-    "prettier": "2.8.2",
+-    "ts-node-dev": "^2.0.0"
++    "@types/node": "^22.13.10",
++    "@types/react": "^18.3.18",
++    "@types/react-dom": "^18.3.5",
++    "prettier": "^3.5.3",
++    "tsx": "^4.19.3"
+   }
+ }
+-- 
+2.43.0
+

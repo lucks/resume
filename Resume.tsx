@@ -13,7 +13,7 @@ export const Resume: React.FC = () => {
         <link
           rel="preconnect"
           href="https://fonts.gstatic.com"
-          crossOrigin=""
+          crossOrigin="anonymous"
         />
         <link
           href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&display=swap"
@@ -47,11 +47,11 @@ export const Resume: React.FC = () => {
               },
               {
                 label: "GitHub",
-                href: "https://www.github.com/",
+                href: "https://github.com/lucks",
               },
               {
                 label: "LinkedIn",
-                href: "https://www.linkedin.com",
+                href: "https://www.linkedin.com/in/lucksdev",
               },
             ]}
           />
@@ -288,6 +288,17 @@ const EducationSubsection: React.FC<{
   );
 };
 
+const ALLOWED_URL_SCHEMES = ["http:", "https:", "mailto:", "tel:"];
+
+function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return ALLOWED_URL_SCHEMES.some((scheme) => parsed.protocol === scheme);
+  } catch {
+    return false;
+  }
+}
+
 interface ILink {
   label: React.ReactNode;
   href: string;
@@ -295,8 +306,8 @@ interface ILink {
   className?: string;
   highlight?: boolean;
 }
-function isLink(x: any): x is ILink {
-  return x.label !== undefined;
+function isLink(x: unknown): x is ILink {
+  return typeof x === "object" && x !== null && "label" in x;
 }
 const Link: React.FC<ILink> = ({
   label,
@@ -305,10 +316,14 @@ const Link: React.FC<ILink> = ({
   highlight,
   target = "_blank",
 }) => {
-  const a = (
-    <a target={target} href={href} className={className}>
+  const safe = isSafeUrl(href);
+  const rel = target === "_blank" ? "noopener noreferrer" : undefined;
+  const a = safe ? (
+    <a target={target} href={href} className={className} rel={rel}>
       {label}
     </a>
+  ) : (
+    <span className={className}>{label}</span>
   );
   return highlight ? <strong>{a}</strong> : a;
 };
